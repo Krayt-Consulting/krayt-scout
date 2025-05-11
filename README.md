@@ -34,4 +34,42 @@ pip install -r requirements.txt
 
 # Run a full scan
 python -m krayt_scout.main scanme.nmap.org --all
+```
+
+---
+
+## 🛠 CLI Usage
+
+```bash
+python -m krayt_scout.main <target> [options]
+```
+
+### Options:
+
+| Flag        | Description                                      |
+|-------------|--------------------------------------------------|
+| `--dns`     | Run DNS record + zone transfer checks            |
+| `--ports`   | Scan top TCP ports (Nmap or fallback)            |
+| `--tls`     | Fetch TLS certificate and protocol configuration |
+| `--all`     | Run all scans                                    |
+
+---
+
+## 🧠 Why Krayt Scout?
+
+- Designed for **security audits**, **lightweight recon**, and **risk assessments**
+- Built by pros for **SMBs, IT teams, and consultants**
+- Easy to run, easy to interpret—no heavy setup
+
+---
+
+## 🤝 About Krayt Consulting
+
+[Krayt Consulting](https://krayt.pw) provides cybersecurity services for small businesses, startups, and local firms. We help you secure what matters—without enterprise bloat.
+
+---
+
+## 📄 License
+
+MIT — see [LICENSE](LICENSE)
 
