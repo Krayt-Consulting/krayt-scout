@@ -39,7 +39,7 @@ def check_zone_transfer(domain):
         for ns in ns_records:
             ns_name = str(ns).rstrip('.')
             try:
-                ns_ip = socket.gethostbyname(ns_name)  # 👈 Resolve NS to IP
+                ns_ip = socket.gethostbyname(ns_name)  # Resolve NS to IP
                 zone = dns.zone.from_xfr(dns.query.xfr(ns_ip, domain, timeout=5))
                 if zone:
                     vulnerable_servers.append(ns_name)

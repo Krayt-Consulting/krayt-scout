@@ -42,33 +42,3 @@ def get_certificate_info(host: str, port: int = 443) -> Optional[dict]:
         "tls_version": tls_version,
         "cipher": cipher
     }
-
-
-def print_tls_summary(info: dict) -> None:
-    """Formats and prints a summary of the certificate and TLS info."""
-    if not info:
-        print("[!] No TLS info available.")
-        return
-
-    print("\n🔐 TLS Configuration:")
-    print(f"  TLS Version: {info['tls_version']}")
-    print(f"  Cipher Suite: {info['cipher'][0]} ({info['cipher'][1]})")
-
-    print("\n📄 Certificate Info:")
-    print(f"  Subject: {info['subject']}")
-    print(f"  Issuer: {info['issuer']}")
-    print(f"  Valid From: {info['not_before']}")
-    print(f"  Valid Until: {info['not_after']}")
-
-    try:
-        exp_date = datetime.strptime(info["not_after"], "%b %d %H:%M:%S %Y %Z")
-        days_left = (exp_date - datetime.utcnow()).days
-        if days_left < 0:
-            print(f"  🔴 Certificate has EXPIRED! ({-days_left} days ago)")
-        elif days_left < 30:
-            print(f"  🟠 Certificate expires soon: {days_left} days remaining")
-        else:
-            print(f"  🟢 Certificate is valid: {days_left} days remaining")
-    except Exception:
-        print("  ⚠️ Could not parse expiration date")
-
