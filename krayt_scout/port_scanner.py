@@ -19,10 +19,31 @@ import nmap
 
 # Common TCP ports
 TOP_PORTS = [
-    21, 22, 23, 25, 53, 80, 110, 135, 139, 143,
-    443, 445, 993, 995, 1433, 1521, 1723, 3306, 3389, 5900,
-    8080, 8443, 8888
+    21,
+    22,
+    23,
+    25,
+    53,
+    80,
+    110,
+    135,
+    139,
+    143,
+    443,
+    445,
+    993,
+    995,
+    1433,
+    1521,
+    1723,
+    3306,
+    3389,
+    5900,
+    8080,
+    8443,
+    8888,
 ]
+
 
 def is_host_up(host, port=80, timeout=2):
     try:
@@ -31,21 +52,23 @@ def is_host_up(host, port=80, timeout=2):
     except:
         return False
 
+
 def scan_with_nmap(host, ports=None):
     scanner = nmap.PortScanner()
-    port_range = ','.join(map(str, ports)) if ports else '1-1000'
+    port_range = ",".join(map(str, ports)) if ports else "1-1000"
     try:
-        scanner.scan(hosts=host, arguments=f'-p {port_range} -T4')
+        scanner.scan(hosts=host, arguments=f"-p {port_range} -T4")
 
         # Handle IP-keyed result fallback
         target = list(scanner.all_hosts())[0] if scanner.all_hosts() else None
-        if not target or 'tcp' not in scanner[target]:
+        if not target or "tcp" not in scanner[target]:
             return {}
 
-        return scanner[target]['tcp']
+        return scanner[target]["tcp"]
     except Exception as e:
         print(f"[!] Nmap scan failed: {e}")
         return {}
+
 
 def fallback_scan(host, ports, timeout=1):
     results = {}
@@ -54,11 +77,12 @@ def fallback_scan(host, ports, timeout=1):
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.settimeout(timeout)
             result = sock.connect_ex((host, port))
-            results[port] = 'open' if result == 0 else 'closed'
+            results[port] = "open" if result == 0 else "closed"
             sock.close()
         except Exception:
-            results[port] = 'error'
+            results[port] = "error"
     return results
+
 
 def run_port_scan(host, ports=TOP_PORTS, use_nmap=True):
     if not is_host_up(host):
@@ -68,8 +92,6 @@ def run_port_scan(host, ports=TOP_PORTS, use_nmap=True):
     print(f"[*] Scanning {host} on {len(ports)} ports...")
     if use_nmap:
         results = scan_with_nmap(host, ports)
-        return {p: d['state'] for p, d in results.items()}
+        return {p: d["state"] for p, d in results.items()}
     else:
         return fallback_scan(host, ports)
-
-

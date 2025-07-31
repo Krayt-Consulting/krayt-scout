@@ -40,5 +40,5 @@ def get_certificate_info(host: str, port: int = 443) -> Optional[dict]:
         "not_before": cert.get("notBefore"),
         "not_after": cert.get("notAfter"),
         "tls_version": tls_version,
-        "cipher": cipher
+        "cipher": cipher,
     }

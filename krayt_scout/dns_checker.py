@@ -20,8 +20,9 @@ import dns.zone
 import dns.exception
 import socket
 
+
 def get_dns_records(domain):
-    record_types = ['A', 'MX', 'TXT', 'NS']
+    record_types = ["A", "MX", "TXT", "NS"]
     results = {}
     for record_type in record_types:
         try:
@@ -31,13 +32,14 @@ def get_dns_records(domain):
             results[record_type] = []
     return results
 
+
 def check_zone_transfer(domain):
     try:
-        ns_records = dns.resolver.resolve(domain, 'NS')
+        ns_records = dns.resolver.resolve(domain, "NS")
         vulnerable_servers = []
 
         for ns in ns_records:
-            ns_name = str(ns).rstrip('.')
+            ns_name = str(ns).rstrip(".")
             try:
                 ns_ip = socket.gethostbyname(ns_name)  # Resolve NS to IP
                 zone = dns.zone.from_xfr(dns.query.xfr(ns_ip, domain, timeout=5))

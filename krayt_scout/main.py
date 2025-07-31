@@ -12,10 +12,12 @@
 import argparse
 from krayt_scout import dns_checker, port_scanner, reporter, tls_checker
 
+
 def run_tls_check(target: str) -> None:
     """Run TLS configuration and certificate analysis."""
     tls_info = tls_checker.get_certificate_info(target)
     reporter.pretty_print_tls(tls_info)
+
 
 def run_dns_scan(target: str) -> None:
     """Fetch DNS records and test for zone transfer."""
@@ -45,16 +47,22 @@ def run_all_scans(target: str) -> None:
     run_port_scan(target)
     run_tls_check(target)
 
+
 def parse_args() -> argparse.Namespace:
     """Parse command-line arguments."""
     parser = argparse.ArgumentParser(
-        prog="krayt-scout",
-        description="Krayt Scout - Lightweight Cyber Recon Tool"
+        prog="krayt-scout", description="Krayt Scout - Lightweight Cyber Recon Tool"
     )
     parser.add_argument("target", help="Target domain or IP")
-    parser.add_argument("--dns", action="store_true", help="Run DNS record + zone transfer checks")
-    parser.add_argument("--ports", action="store_true", help="Run port scan on common ports")
-    parser.add_argument("--tls", action="store_true", help="Run TLS certificate and config check")
+    parser.add_argument(
+        "--dns", action="store_true", help="Run DNS record + zone transfer checks"
+    )
+    parser.add_argument(
+        "--ports", action="store_true", help="Run port scan on common ports"
+    )
+    parser.add_argument(
+        "--tls", action="store_true", help="Run TLS certificate and config check"
+    )
     parser.add_argument("--all", action="store_true", help="Run all scans")
     return parser.parse_args()
 
@@ -82,4 +90,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

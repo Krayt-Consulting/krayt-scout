@@ -23,6 +23,7 @@ from datetime import datetime
 
 console = Console()
 
+
 def pretty_print_tls(info: dict) -> None:
     """Prints TLS configuration and cert validity with styling."""
     if not info:
@@ -59,15 +60,23 @@ def pretty_print_tls(info: dict) -> None:
         exp_date = datetime.strptime(info["not_after"], "%b %d %H:%M:%S %Y %Z")
         days_left = (exp_date - datetime.utcnow()).days
         if days_left < 0:
-            cert_text.append(f"🔴 Certificate has EXPIRED! ({-days_left} days ago)\n", style="bold red")
+            cert_text.append(
+                f"🔴 Certificate has EXPIRED! ({-days_left} days ago)\n",
+                style="bold red",
+            )
         elif days_left < 30:
-            cert_text.append(f"🟠 Certificate expires soon: {days_left} days left\n", style="yellow")
+            cert_text.append(
+                f"🟠 Certificate expires soon: {days_left} days left\n", style="yellow"
+            )
         else:
-            cert_text.append(f"🟢 Certificate is valid: {days_left} days remaining\n", style="green")
+            cert_text.append(
+                f"🟢 Certificate is valid: {days_left} days remaining\n", style="green"
+            )
     except Exception:
         cert_text.append("⚠️ Could not parse expiration date\n", style="red")
 
     console.print(Panel(cert_text, title="📄 Certificate Info", expand=False))
+
 
 def pretty_print_ports(port_results):
     summary = Counter(port_results.values())
@@ -78,17 +87,16 @@ def pretty_print_ports(port_results):
 
     for port in sorted(port_results):
         state = port_results[port]
-        style = {
-            "open": "green",
-            "filtered": "yellow",
-            "closed": "dim"
-        }.get(state, "white")
+        style = {"open": "green", "filtered": "yellow", "closed": "dim"}.get(
+            state, "white"
+        )
 
         table.add_row(str(port), f"[{style}]{state}[/{style}]")
 
     console.print(table)
 
-    console.print(f"\n[bold green]Open:[/] {summary['open']}  "
-                  f"[bold yellow]Filtered:[/] {summary['filtered']}  "
-                  f"[bold dim]Closed:[/] {summary['closed']}")
-
+    console.print(
+        f"\n[bold green]Open:[/] {summary['open']}  "
+        f"[bold yellow]Filtered:[/] {summary['filtered']}  "
+        f"[bold dim]Closed:[/] {summary['closed']}"
+    )
