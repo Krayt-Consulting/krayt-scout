@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "krayt-scout"
-version = "0.1.0"
+version = "0.1.1"
 description = "Lightweight cyber recon tool for DNS, port scanning, and TLS inspection"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 license = {text = "MIT"}
 authors = [
     {name = "Krayt Consulting", email = "admin@krayt.pw"}
@@ -19,8 +19,6 @@ classifiers = [
     "Intended Audience :: System Administrators",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
@@ -58,7 +56,7 @@ packages = ["krayt_scout"]
 krayt_scout = ["py.typed"]
 
 [tool.ruff]
-target-version = "py310"
+target-version = "py312"
 line-length = 88
 select = [
     "E",   # pycodestyle errors
@@ -83,7 +81,7 @@ known-first-party = ["krayt_scout"]
 include = ["krayt_scout"]
 exclude = ["**/__pycache__"]
 typeCheckingMode = "standard"
-pythonVersion = "3.14"
+pythonVersion = "3.12"
 reportMissingImports = true
 reportMissingTypeStubs = false
 
