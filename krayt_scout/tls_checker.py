@@ -55,7 +55,10 @@ def get_certificate_info(host: str, port: int = 443) -> CertificateInfo | None:
             cert = ssock.getpeercert()
             tls_version = ssock.version()
             cipher = ssock.cipher()
-    except TimeoutError as e:
+    except ConnectionRefusedError:
+        print(f"[!] Connection refused on {host}:{port} - TLS/HTTPS not available")
+        return None
+    except (TimeoutError, OSError, ssl.SSLError) as e:
         print(f"[!] Failed to connect or fetch TLS info: {e}")
         return None
 
