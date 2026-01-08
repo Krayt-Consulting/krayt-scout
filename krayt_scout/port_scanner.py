@@ -45,15 +45,15 @@ TOP_PORTS = [
 ]
 
 
-def is_host_up(host, port=80, timeout=2):
+def is_host_up(host: str, port: int = 80, timeout: float = 2) -> bool:
     try:
         with socket.create_connection((host, port), timeout=timeout):
             return True
-    except:
+    except (OSError, socket.timeout):
         return False
 
 
-def scan_with_nmap(host, ports=None):
+def scan_with_nmap(host: str, ports: list[int] | None = None) -> dict[int, str]:
     scanner = nmap.PortScanner()
     port_range = ",".join(map(str, ports)) if ports else "1-1000"
     try:
@@ -65,26 +65,27 @@ def scan_with_nmap(host, ports=None):
             return {}
 
         return scanner[target]["tcp"]
-    except Exception as e:
+    except (nmap.PortScannerError, KeyError, IndexError) as e:
         print(f"[!] Nmap scan failed: {e}")
         return {}
 
 
-def fallback_scan(host, ports, timeout=1):
+def fallback_scan(host: str, ports: list[int], timeout: float = 1) -> dict[int, str]:
     results = {}
     for port in ports:
         try:
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.settimeout(timeout)
-            result = sock.connect_ex((host, port))
-            results[port] = "open" if result == 0 else "closed"
-            sock.close()
-        except Exception:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+                sock.settimeout(timeout)
+                result = sock.connect_ex((host, port))
+                results[port] = "open" if result == 0 else "closed"
+        except (OSError, socket.timeout):
             results[port] = "error"
     return results
 
 
-def run_port_scan(host, ports=TOP_PORTS, use_nmap=True):
+def run_port_scan(
+    host: str, ports: list[int] = TOP_PORTS, use_nmap: bool = True
+) -> dict[int, str]:
     if not is_host_up(host):
         print(f"[!] Host {host} appears to be down.")
         return {}
