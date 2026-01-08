@@ -48,12 +48,14 @@ def get_certificate_info(host: str, port: int = 443) -> CertificateInfo | None:
     context = ssl.create_default_context()
 
     try:
-        with socket.create_connection((host, port), timeout=5) as sock:
-            with context.wrap_socket(sock, server_hostname=host) as ssock:
-                cert = ssock.getpeercert()
-                tls_version = ssock.version()
-                cipher = ssock.cipher()
-    except (OSError, ssl.SSLError, socket.timeout) as e:
+        with (
+            socket.create_connection((host, port), timeout=5) as sock,
+            context.wrap_socket(sock, server_hostname=host) as ssock,
+        ):
+            cert = ssock.getpeercert()
+            tls_version = ssock.version()
+            cipher = ssock.cipher()
+    except TimeoutError as e:
         print(f"[!] Failed to connect or fetch TLS info: {e}")
         return None
 
@@ -62,8 +64,8 @@ def get_certificate_info(host: str, port: int = 443) -> CertificateInfo | None:
         return None
 
     # Cast the cert dict values to expected types
-    subject = cast(DistinguishedName, cert.get("subject", ()))
-    issuer = cast(DistinguishedName, cert.get("issuer", ()))
+    subject = cast("DistinguishedName", cert.get("subject", ()))
+    issuer = cast("DistinguishedName", cert.get("issuer", ()))
     not_before = cert.get("notBefore")
     not_after = cert.get("notAfter")
 
