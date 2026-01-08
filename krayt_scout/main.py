@@ -72,19 +72,18 @@ def main() -> None:
     """Main CLI entrypoint."""
     args = parse_args()
 
+    # Determine if any scan was requested
+    any_scan_selected = args.dns or args.ports or args.tls
+
     if args.all:
         run_all_scans(args.target)
+    elif not any_scan_selected:
+        print("[!] No scan type selected. Use --dns, --ports, --tls, or --all.")
     else:
-        if not args.dns and not args.ports:
-            print("[!] No scan type selected. Use --dns, --ports, or --all.")
-            return
-
         if args.dns:
             run_dns_scan(args.target)
-
         if args.ports:
             run_port_scan(args.target)
-
         if args.tls:
             run_tls_check(args.target)
 
