@@ -21,7 +21,7 @@ import dns.exception
 import socket
 
 
-def get_dns_records(domain):
+def get_dns_records(domain: str) -> dict[str, list[str]]:
     record_types = ["A", "MX", "TXT", "NS"]
     results = {}
     for record_type in record_types:
@@ -33,7 +33,7 @@ def get_dns_records(domain):
     return results
 
 
-def check_zone_transfer(domain):
+def check_zone_transfer(domain: str) -> list[str]:
     try:
         ns_records = dns.resolver.resolve(domain, "NS")
         vulnerable_servers = []
