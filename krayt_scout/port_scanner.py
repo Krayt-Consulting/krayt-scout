@@ -15,6 +15,7 @@
 # ─────────────────────────────────────────────────────────────────────────────
 
 import socket
+
 import nmap
 
 # Common TCP ports
@@ -46,14 +47,16 @@ TOP_PORTS = [
 
 
 def is_host_up(host: str, port: int = 80, timeout: float = 2) -> bool:
+    """Check if a host is reachable by attempting a TCP connection."""
     try:
         with socket.create_connection((host, port), timeout=timeout):
             return True
-    except (OSError, socket.timeout):
+    except TimeoutError:
         return False
 
 
 def scan_with_nmap(host: str, ports: list[int] | None = None) -> dict[int, str]:
+    """Scan ports using Nmap for service detection and state information."""
     scanner = nmap.PortScanner()
     port_range = ",".join(map(str, ports)) if ports else "1-1000"
     try:
@@ -71,6 +74,7 @@ def scan_with_nmap(host: str, ports: list[int] | None = None) -> dict[int, str]:
 
 
 def fallback_scan(host: str, ports: list[int], timeout: float = 1) -> dict[int, str]:
+    """Perform basic TCP port scanning using raw sockets as fallback."""
     results = {}
     for port in ports:
         try:
@@ -78,7 +82,7 @@ def fallback_scan(host: str, ports: list[int], timeout: float = 1) -> dict[int, 
                 sock.settimeout(timeout)
                 result = sock.connect_ex((host, port))
                 results[port] = "open" if result == 0 else "closed"
-        except (OSError, socket.timeout):
+        except TimeoutError:
             results[port] = "error"
     return results
 
@@ -86,6 +90,7 @@ def fallback_scan(host: str, ports: list[int], timeout: float = 1) -> dict[int, 
 def run_port_scan(
     host: str, ports: list[int] = TOP_PORTS, use_nmap: bool = True
 ) -> dict[int, str]:
+    """Execute port scan on target host using nmap or fallback method."""
     if not is_host_up(host):
         print(f"[!] Host {host} appears to be down.")
         return {}
