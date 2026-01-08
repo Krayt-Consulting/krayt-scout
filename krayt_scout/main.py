@@ -10,6 +10,7 @@
 # ─────────────────────────────────────────────────────────────────────────────
 
 import argparse
+
 from krayt_scout import dns_checker, port_scanner, reporter, tls_checker
 
 
@@ -21,12 +22,12 @@ def run_tls_check(target: str) -> None:
 
 def run_dns_scan(target: str) -> None:
     """Fetch DNS records and test for zone transfer."""
-    print(f"\n🔍 Running DNS checks for {target}...")
+    print(f"\n* Running DNS checks for {target}...")
     dns_records = dns_checker.get_dns_records(target)
     for rtype, records in dns_records.items():
         print(f"{rtype} Records: {records or 'None'}")
 
-    print("\n🛡️ Checking for zone transfer vulnerabilities...")
+    print("\n* Checking for zone transfer vulnerabilities...")
     zones = dns_checker.check_zone_transfer(target)
     if zones:
         print(f"[!] Zone transfer ALLOWED on: {zones}")
@@ -36,7 +37,7 @@ def run_dns_scan(target: str) -> None:
 
 def run_port_scan(target: str) -> None:
     """Run port scan and display results."""
-    print(f"\n🔌 Scanning ports on {target}...")
+    print(f"\n* Scanning ports on {target}...")
     results = port_scanner.run_port_scan(target)
     reporter.pretty_print_ports(results)
 
