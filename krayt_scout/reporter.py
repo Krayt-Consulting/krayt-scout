@@ -14,17 +14,30 @@
 # Built by Krayt Consulting (https://krayt.pw)
 # ─────────────────────────────────────────────────────────────────────────────
 
-from rich.console import Console
-from rich.table import Table
 from collections import Counter
+from datetime import datetime, timezone
+from typing import TypedDict
+
+from rich.console import Console
 from rich.panel import Panel
+from rich.table import Table
 from rich.text import Text
-from datetime import datetime
 
 console = Console()
 
 
-def pretty_print_tls(info: dict) -> None:
+class CertificateInfo(TypedDict):
+    """Type for TLS certificate information."""
+
+    subject: str
+    issuer: str
+    not_before: str | None
+    not_after: str | None
+    tls_version: str | None
+    cipher: tuple[str, str, int] | None
+
+
+def pretty_print_tls(info: CertificateInfo | None) -> None:
     """Prints TLS configuration and cert validity with styling."""
     if not info:
         console.print("[bold red][!] No TLS info available.[/bold red]")
@@ -35,11 +48,12 @@ def pretty_print_tls(info: dict) -> None:
     tls_text.append("TLS Version: ", style="bold")
     tls_text.append(f"{info['tls_version']}\n", style="green")
 
-    tls_text.append("Cipher Suite: ", style="bold")
-    tls_text.append(f"{info['cipher'][0]} ", style="cyan")
-    tls_text.append(f"({info['cipher'][1]})\n", style="dim")
+    if info["cipher"]:
+        tls_text.append("Cipher Suite: ", style="bold")
+        tls_text.append(f"{info['cipher'][0]} ", style="cyan")
+        tls_text.append(f"({info['cipher'][1]})\n", style="dim")
 
-    console.print(Panel(tls_text, title="🔐 TLS Configuration", expand=False))
+    console.print(Panel(tls_text, title="[TLS Configuration]", expand=False))
 
     # Certificate Section
     cert_text = Text()
@@ -56,29 +70,35 @@ def pretty_print_tls(info: dict) -> None:
     cert_text.append(f"{info['not_after']}\n", style="green")
 
     # Expiry Warning
-    try:
-        exp_date = datetime.strptime(info["not_after"], "%b %d %H:%M:%S %Y %Z")
-        days_left = (exp_date - datetime.utcnow()).days
-        if days_left < 0:
-            cert_text.append(
-                f"🔴 Certificate has EXPIRED! ({-days_left} days ago)\n",
-                style="bold red",
-            )
-        elif days_left < 30:
-            cert_text.append(
-                f"🟠 Certificate expires soon: {days_left} days left\n", style="yellow"
-            )
-        else:
-            cert_text.append(
-                f"🟢 Certificate is valid: {days_left} days remaining\n", style="green"
-            )
-    except Exception:
-        cert_text.append("⚠️ Could not parse expiration date\n", style="red")
+    if info["not_after"]:
+        try:
+            exp_date = datetime.strptime(info["not_after"], "%b %d %H:%M:%S %Y %Z")
+            now = datetime.now(timezone.utc).replace(tzinfo=None)
+            days_left = (exp_date - now).days
 
-    console.print(Panel(cert_text, title="📄 Certificate Info", expand=False))
+            if days_left < 0:
+                cert_text.append(
+                    f"[!] Certificate has EXPIRED! ({-days_left} days ago)\n",
+                    style="bold red",
+                )
+            elif days_left < 30:
+                cert_text.append(
+                    f"[WARNING] Certificate expires soon: {days_left} days left\n",
+                    style="yellow",
+                )
+            else:
+                cert_text.append(
+                    f"[OK] Certificate is valid: {days_left} days remaining\n",
+                    style="green",
+                )
+        except ValueError as e:
+            cert_text.append(f"[!] Could not parse expiration date: {e}\n", style="red")
+
+    console.print(Panel(cert_text, title="[Certificate Info]", expand=False))
 
 
-def pretty_print_ports(port_results):
+def pretty_print_ports(port_results: dict[int, str]) -> None:
+    """Prints port scan results in a formatted table."""
     summary = Counter(port_results.values())
 
     table = Table(title="Port Scan Results", show_lines=True)
